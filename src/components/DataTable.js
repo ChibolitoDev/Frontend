@@ -1,14 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Table, Button, Container, FormGroup, ModalBody, ModalHeader, ModalFooter, Modal } from 'reactstrap'
 import axios from 'axios';
-import { Table, Button, Container } from 'reactstrap'
+
+
+
+const baseUrl = "http://127.0.0.1:5000/";
+
 
 const DataTable = () => {
-    const baseUrl = "http://127.0.0.1:5000/";
-    const [data, setData] = useState([]);
 
-    const getData = async () => {
+    const [data, setData] = useState([]); // Data en la tabla
+
+    const [dataS, setDataS] = useState({ //Data a insertar 
+        id: '',
+        level_1: '',
+        level_2: '',
+        year: '',
+        value: ''
+    })
+
+    const [insert, setInsert] = useState(false); //Variables para insertar
+
+    const getData = async () => { //GetMethod
         await axios.get(baseUrl)
             .then(res => {
                 setData(res.data)
@@ -17,15 +32,36 @@ const DataTable = () => {
             })
     }
 
-    useEffect(() => {
+    const postData = async () => { //PostMethod
+        delete dataS.id;
+        await axios.post(baseUrl, dataS)
+            .then(res => {
+                setData(data.concat(res.data))
+                openInsert()
+            }).catch(error => {
+                console.log(error)
+            })
+    }
+
+
+    const openInsert = () => { //Abrir el insert
+        setInsert(!insert);
+    }
+
+    useEffect(() => { //Cambiar data cada vez que cambie un valor
         getData();
     }, [])
+
+    const handleChange = e => { //Agregando data al array
+        const { name, value } = e.target;
+        setDataS({ ...dataS, [name]: value });
+    }
 
     return (
         <>
             <Container>
                 <br />
-                <Button color="primary">Insertar nueva Data</Button>
+                <Button color="primary" onClick={() => openInsert()}>Insertar nueva Data</Button>
                 <br />
                 <Table>
                     <thead>
@@ -51,7 +87,7 @@ const DataTable = () => {
 
                         {
                             data.map(element => (
-                                <tr>
+                                <tr key={element.id}>
                                     <td>
                                         {element.level_1}
                                     </td>
@@ -80,10 +116,45 @@ const DataTable = () => {
                 </Table>
 
             </ Container>
+
+            <Modal isOpen={insert}>
+                <ModalBody>
+                    <ModalHeader> Insertar Data</ModalHeader>
+                    <FormGroup>
+                        <label>
+                            Level_1:
+                        </label>
+                        <br />
+                        <input className='form-control' type='text' name="level_1" onChange={handleChange} />
+                        <label>
+                            Level_2:
+                        </label>
+                        <br />
+                        <input className='form-control' type='text' name="level_2" onChange={handleChange} />
+                        <label>
+                            year:
+                        </label>
+                        <br />
+                        <input className='form-control' type='text' name="year" onChange={handleChange} />
+                        <label>
+                            value:
+                        </label>
+                        <br />
+                        <input className='form-control' type='text' name="value" onChange={handleChange} />
+                    </FormGroup>
+                    <ModalFooter>
+                        <Button className='btn btn-primary' onClick={() => postData()} > Insertar </Button>
+                        <Button className='btn btn-danger' onClick={() => openInsert()}> Cancelar </Button>
+                    </ModalFooter>
+                </ModalBody>
+            </Modal>
+
         </>
 
     )
 }
+
+
 
 
 export default DataTable;
