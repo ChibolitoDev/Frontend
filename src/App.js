@@ -1,12 +1,11 @@
 import React from 'react';
-import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import DataTable from './components/DataTable';
+import Index from './components/Index';
 
 const App = () => {
   return (
     <>
-      <DataTable></DataTable>
+      <Index></Index>
     </>
 
   )
