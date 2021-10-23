@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Table, Button, Container, FormGroup, ModalBody, ModalHeader, ModalFooter, Modal } from 'reactstrap'
-import axios from 'axios';
+import { Button, Container } from 'reactstrap'
 import DataTable from './DataTable';
 import InsertData from './InsertData';
 import EditData from './EditData';
 import DeleteData from './DeleteData';
+import { getData, postData, putData, deleteData } from './../utils/ApiCalls';
 
-
-
-const baseUrl = "http://127.0.0.1:5000/";
 
 
 const Index = () => {
@@ -29,55 +26,6 @@ const Index = () => {
 
     const [edit, setEdit] = useState(false); //variables para editar
 
-    const getData = async () => { //GetMethod
-        await axios.get(baseUrl)
-            .then(res => {
-                setData(res.data)
-            }).catch(error => {
-                console.log(error)
-            })
-    }
-
-    const postData = async () => { //PostMethod
-        delete dataS.id;
-        await axios.post(baseUrl, dataS)
-            .then(res => {
-                setData(data.concat(res.data))
-                openInsert()
-            }).catch(error => {
-                console.log(error)
-            })
-    }
-
-    const putData = async () => { //PostMethod
-        await axios.put(`${baseUrl}/${dataS.id}`, dataS)
-            .then(res => {
-                var resp = res.data
-                var dataAux = data;
-                dataAux.map(element => {
-                    if (element.id === resp.id) { element = resp }
-                })
-                getData();
-                openEdit()
-            }).catch(error => {
-                console.log(error)
-            })
-    }
-    const deleteData = async () => { //PostMethod
-        await axios.delete(`${baseUrl}/${dataS.id}`)
-            .then(res => {
-                getData();
-                openDelete()
-            }).catch(error => {
-                console.log(error)
-            })
-    }
-    const SingleData = (data, caso) => {
-        setDataS(data)
-        caso === "Editar" && openEdit();
-        caso === "Eliminar" && openDelete();
-    }
-
     const openInsert = () => { //Abrir el insert
         setInsert(!insert);
     }
@@ -91,8 +39,23 @@ const Index = () => {
     }
 
 
+    const DataGet = () => (getData({ setData }));
+
+    const DataPost = () => (postData({ dataS, setData, data, openInsert }));
+
+    const DataPut = () => (putData({ dataS, data, openEdit, setData }));
+
+    const DataDelete = () => (deleteData({ dataS, openDelete, setData }));
+
+    const SingleData = (data, caso) => {
+        setDataS(data)
+        caso === "Editar" && openEdit();
+        caso === "Eliminar" && openDelete();
+    }
+
+
     useEffect(() => { //RecibirData
-        getData();
+        DataGet();
     }, [])
 
     const handleChange = e => { //Agregando data al array
@@ -110,11 +73,11 @@ const Index = () => {
                 <DataTable data={data} SingleData={SingleData} />
             </ Container>
 
-            <InsertData insert={insert} handleChange={handleChange} postData={postData} openInsert={openInsert} />
+            <InsertData insert={insert} handleChange={handleChange} postData={DataPost} openInsert={openInsert} />
 
-            <EditData edit={edit} dataS={dataS} handleChange={handleChange} putData={putData} openEdit={openEdit} />
+            <EditData edit={edit} dataS={dataS} handleChange={handleChange} putData={DataPut} openEdit={openEdit} />
 
-            <DeleteData del={del} dataS={dataS} handleChange={handleChange} deleteData={deleteData} openDelete={openDelete} />
+            <DeleteData del={del} dataS={dataS} handleChange={handleChange} deleteData={DataDelete} openDelete={openDelete} />
         </>
 
     )
