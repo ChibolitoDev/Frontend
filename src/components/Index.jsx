@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Container } from 'reactstrap'
 import DataTable from './DataTable';
@@ -9,22 +9,8 @@ import { getData, postData, putData, deleteData } from './../utils/ApiCalls';
 
 
 
-const Index = () => {
+const Index = ({ data, setData, dataS, setDataS, insert, setInsert, del, setDelete, edit, setEdit }) => {
 
-    const [data, setData] = useState([]); // Data en la tabla
-
-    const [dataS, setDataS] = useState({ //Data a insertar 
-        id: '',
-        level_1: '',
-        level_2: '',
-        year: '',
-        value: ''
-    })
-
-    const [insert, setInsert] = useState(false); //Variables para insertar
-    const [del, setDelete] = useState(false); //variables para editar
-
-    const [edit, setEdit] = useState(false); //variables para editar
 
     const openInsert = () => { //Abrir el insert
         setInsert(!insert);
