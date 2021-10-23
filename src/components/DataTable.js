@@ -22,6 +22,9 @@ const DataTable = () => {
     })
 
     const [insert, setInsert] = useState(false); //Variables para insertar
+    const [del, setDelete] = useState(false); //variables para editar
+
+    const [edit, setEdit] = useState(false); //variables para editar
 
     const getData = async () => { //GetMethod
         await axios.get(baseUrl)
@@ -43,12 +46,49 @@ const DataTable = () => {
             })
     }
 
+    const putData = async () => { //PostMethod
+        await axios.put(`${baseUrl}/${dataS.id}`, dataS)
+            .then(res => {
+                var resp = res.data
+                var dataAux = data;
+                dataAux.map(element => {
+                    if (element.id === resp.id) { element = resp }
+                })
+                getData();
+                openEdit()
+            }).catch(error => {
+                console.log(error)
+            })
+    }
+    const deleteData = async () => { //PostMethod
+        await axios.delete(`${baseUrl}/${dataS.id}`)
+            .then(res => {
+                getData();
+                openDelete()
+            }).catch(error => {
+                console.log(error)
+            })
+    }
+    const SingleData = (data, caso) => {
+        setDataS(data)
+        caso === "Editar" && openEdit();
+        caso === "Eliminar" && openDelete();
+    }
 
     const openInsert = () => { //Abrir el insert
         setInsert(!insert);
     }
 
-    useEffect(() => { //Cambiar data cada vez que cambie un valor
+    const openEdit = () => { //Abrir el edit
+        setEdit(!edit);
+    }
+
+    const openDelete = () => {
+        setDelete(!del);
+    }
+
+
+    useEffect(() => { //RecibirData
         getData();
     }, [])
 
@@ -101,12 +141,12 @@ const DataTable = () => {
                                         {element.value}
                                     </td>
                                     <td>
-                                        <Button color="primary">
+                                        <Button color="primary" onClick={() => SingleData(element, "Editar")}>
                                             Editar
                                         </Button>
                                     </td>
                                     <td>
-                                        <Button color="danger">
+                                        <Button color="danger" onClick={() => SingleData(element, "Eliminar")}>
                                             Eliminar
                                         </Button>
                                     </td>
@@ -149,6 +189,73 @@ const DataTable = () => {
                 </ModalBody>
             </Modal>
 
+            <Modal isOpen={edit}>
+                <ModalBody>
+                    <ModalHeader> Editar Data</ModalHeader>
+                    <FormGroup>
+                        <label>
+                            Level_1:
+                        </label>
+                        <br />
+                        <input className='form-control' type='text' name="level_1" onChange={handleChange} value={dataS && dataS.level_1} />
+                        <label>
+                            Level_2:
+                        </label>
+                        <br />
+                        <input className='form-control' type='text' name="level_2" onChange={handleChange} value={dataS && dataS.level_2} />
+                        <label>
+                            year:
+                        </label>
+                        <br />
+                        <input className='form-control' type='text' name="year" onChange={handleChange} value={dataS && dataS.year} />
+                        <label>
+                            value:
+                        </label>
+                        <br />
+                        <input className='form-control' type='text' name="value" onChange={handleChange} value={dataS && dataS.value} />
+                    </FormGroup>
+                    <ModalFooter>
+                        <Button className='btn btn-primary' onClick={() => putData()} > Editar </Button>
+                        <Button className='btn btn-danger' onClick={() => openEdit()}> Cancelar </Button>
+                    </ModalFooter>
+                </ModalBody>
+            </Modal>
+
+            <Modal isOpen={del}>
+                <ModalBody>
+                    ¿ESTAS SEGURO QUE DESEA ELIMINAR ESTE DATO DE LA BASE DE DATOS?
+                </ModalBody>
+                <FormGroup>
+                    <label>
+                        Level_1:
+                    </label>
+                    <br />
+                    <input className='form-control' type='text' name="level_1" onChange={handleChange} value={dataS && dataS.level_1} readOnly />
+                    <label>
+                        Level_2:
+                    </label>
+                    <br />
+                    <input className='form-control' type='text' name="level_2" onChange={handleChange} value={dataS && dataS.level_2} readOnly />
+                    <label>
+                        year:
+                    </label>
+                    <br />
+                    <input className='form-control' type='text' name="year" onChange={handleChange} value={dataS && dataS.year} readOnly />
+                    <label>
+                        value:
+                    </label>
+                    <br />
+                    <input className='form-control' type='text' name="value" onChange={handleChange} value={dataS && dataS.value} readOnly />
+                </FormGroup>
+                <ModalFooter>
+                    <Button className='btn btn-danger' onClick={() => deleteData()}>
+                        Si
+                    </Button>
+                    <Button className='btn btn-secondary' onClick={() => openDelete()}>
+                        No
+                    </Button>
+                </ModalFooter>
+            </Modal>
         </>
 
     )
