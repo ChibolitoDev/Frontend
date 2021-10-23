@@ -12,6 +12,7 @@ import { getData, postData, putData, deleteData } from './../utils/ApiCalls';
 const Index = ({ data, setData, dataS, setDataS, insert, setInsert, del, setDelete, edit, setEdit }) => {
 
 
+
     const openInsert = () => { //Abrir el insert
         setInsert(!insert);
     }
@@ -20,7 +21,7 @@ const Index = ({ data, setData, dataS, setDataS, insert, setInsert, del, setDele
         setEdit(!edit);
     }
 
-    const openDelete = () => {
+    const openDelete = () => { //Abrir el delete
         setDelete(!del);
     }
 

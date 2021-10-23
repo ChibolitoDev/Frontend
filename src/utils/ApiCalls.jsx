@@ -15,8 +15,8 @@ export const postData = async ({ dataS, setData, data, openInsert }) => { //Post
     delete dataS.id;
     await axios.post(Url, dataS)
         .then(res => {
-            setData(data.concat(res.data))
-            openInsert()
+            setData(data.concat(res.data));
+            openInsert();
         }).catch(error => {
             console.log(error)
         })
